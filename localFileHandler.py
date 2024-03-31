@@ -62,7 +62,8 @@ class LocalFileHandler:
         sys.exit(1)
 
     def getMostRecentFileFromDownloads(self):
-        allDownloadItems = glob.glob(os.path.join(DOWNLOADS_PATH, '*'))
+        downloads_path = os.path.join(os.getenv('USERPROFILE'), 'Downloads')
+        allDownloadItems = glob.glob(os.path.join(downloads_path, '*'))
         allDownloadFiles = [file for file in allDownloadItems if os.path.isfile(file)]
         allCsvFiles = [file for file in allDownloadFiles if os.path.splitext(file)[1].lower() == '.csv']
         allCsvFiles.sort(key=lambda x: os.path.getmtime(x), reverse=True)
@@ -70,7 +71,7 @@ class LocalFileHandler:
         if allCsvFiles:
             return allCsvFiles[0]
         else:
-            print(f"No csv files found in {DOWNLOADS_PATH}")
+            print(f"No csv files found in {downloads_path}")
             self.exitScript()
 
 

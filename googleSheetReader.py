@@ -12,8 +12,13 @@ class GoogleSheetReader:
     
     def getGoogleSheet(self):
         self.authenticateCredentials()
-        spreadsheet = self.client.open_by_key(GOOGLE_SHEET_ID)
-        self.sheet = spreadsheet.worksheet(WORKSHEET_TITLE)
+        try:
+            spreadsheet = self.client.open_by_key(GOOGLE_SHEET_ID)
+            self.sheet = spreadsheet.worksheet(WORKSHEET_TITLE)
+        except:
+            print("You have not hooked up the correct document or have not yet shared it with the service_account email\nExiting")
+            quit()
+            
 
     def authenticateCredentials(self):
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
