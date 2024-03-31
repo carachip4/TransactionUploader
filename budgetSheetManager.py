@@ -45,4 +45,8 @@ class BudgetSheetManager:
         columnIndex = self.headers.index(headerName)
         columnData = [[row[columnIndex]] for row in self.fileData]
         range = f'{column}{self.startingRow}:{column}{len(columnData) + self.startingRow}'
-        self.budgetSheet.update(range, columnData)
+        try:
+            self.budgetSheet.update(range, columnData)
+        except:
+            print("Service account did not have edit permissions\nExiting")
+            exit()

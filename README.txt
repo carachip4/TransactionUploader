@@ -14,7 +14,6 @@ This should download a file that you should put in the same directory as this on
 Edit the constants.py file with your constants
 WORKSHEET_TITLE is the title on the bottom of your page for the sheet you're using
 GOOGLE_SHEET_ID = this will be found in your url e.g. spreadsheets/d/<this-id-here>/edit#gid=
-DOWNLOADS_PATH = Path to your downloads file e.g. "/Users/zachariejohnson/Downloads/"
 GOOGLE_API_CREDENTIALS_FILE = the name of the service account key file you downloaded
 
 As a note - this code assumes the following:
@@ -30,3 +29,5 @@ Description
 Amount
 
 If they do not, we may need to write some custom code for your file
+
+To run, type winpty python importfinances.py in the current directory (may exclude "winpty" if on mac)

@@ -28,6 +28,8 @@ function assignCategory(firstRow, numberOfRows) {
 }
 
 function findCategory(transactionTitle) {
+  var CATEGORY_STARTING_COLUMN = 3;
+  var CATEGORY_STARTING_ROW = 3;
   if (!transactionTitle) {
     return "";
   }
@@ -36,15 +38,15 @@ function findCategory(transactionTitle) {
   var categoriesSheet = ss.getSheetByName(globalVariables.getProperty('categorySheetName'));
   var lastColumn = categoriesSheet.getLastColumn();
   
-  for (var column = 1; column <= lastColumn; column++) {
-    var categoryTitle = categoriesSheet.getRange(1, column).getValue();
-    var keywords = categoriesSheet.getRange(2, column, categoriesSheet.getLastRow()-1, 1).getValues().flat();
-    
-    for (var row = 1; row <= keywords.length; row++) {
-      if (keywords[row-1] == "") {
+  for (var column = CATEGORY_STARTING_COLUMN; column <= lastColumn; column++) {
+    var categoryTitle = categoriesSheet.getRange(CATEGORY_STARTING_ROW, column).getValue();
+    var keywords = categoriesSheet.getRange(CATEGORY_STARTING_ROW + 1, column, categoriesSheet.getLastRow()-1, 1).getValues().flat();
+    for (var row = 0; row <= keywords.length; row++) {
+      if (keywords[row] == "") {
         break;
       }
-      if (transactionTitle.toLowerCase().includes(keywords[row-1].toLowerCase())) {
+      // console.log(`${categoryTitle} - ${keywords[row]} - ${transactionTitle}`)
+      if (transactionTitle.toLowerCase().includes(keywords[row].toLowerCase())) {
         return categoryTitle;
       }
     }
