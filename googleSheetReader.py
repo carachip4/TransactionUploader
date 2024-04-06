@@ -1,12 +1,13 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from constants import GOOGLE_SHEET_ID, GOOGLE_API_CREDENTIALS_FILE, WORKSHEET_TITLE
+from constants import GOOGLE_SHEET_ID, GOOGLE_API_CREDENTIALS_FILE, TRANSACTION_SHEET_TITLE, CATEGORY_SHEET_TITLE
 
 #This class authenticates with google and finds your google sheet
 class GoogleSheetReader:
     def __init__(self):
         self.client = None
-        self.sheet = None
+        self.transactionSheet = None
+        self.categorySheet = None
         self.headers = None
         self.fileData = None
     
@@ -14,7 +15,8 @@ class GoogleSheetReader:
         self.authenticateCredentials()
         try:
             spreadsheet = self.client.open_by_key(GOOGLE_SHEET_ID)
-            self.sheet = spreadsheet.worksheet(WORKSHEET_TITLE)
+            self.transactionSheet = spreadsheet.worksheet(TRANSACTION_SHEET_TITLE)
+            self.categorySheet = spreadsheet.worksheet(CATEGORY_SHEET_TITLE)
         except:
             print("You have not hooked up the correct document or have not yet shared it with the service_account email\nExiting")
             quit()

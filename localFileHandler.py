@@ -1,7 +1,6 @@
 import argparse
 import csv
 import glob
-from constants import DOWNLOADS_PATH
 import os
 import sys
 

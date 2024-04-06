@@ -1,3 +1,5 @@
+from categoryUpdater import CategoryUpdater
+
 # this class handles printing the information from the transaction file on your computer to the google sheet
 class BudgetSheetManager:
     CHASE_DATE_HEADER = "Transaction Date"
@@ -10,8 +12,9 @@ class BudgetSheetManager:
     AMOUNT_COLUMN = "G"
 
 
-    def __init__(self, budgetSheet, headers, data):
-        self.budgetSheet = budgetSheet
+    def __init__(self, transactionSheet, categorySheet, headers, data):
+        self.transactionSheet = transactionSheet
+        self.categorySheet = categorySheet
         self.headers = headers
         self.fileData = data
         self.startingRow = None
@@ -23,12 +26,18 @@ class BudgetSheetManager:
         self.printDescriptionToSheet()
         self.printAmountToSheet()
 
+        descriptionData = self.getColumnData(self.DESCRIPTION_HEADER)
+        categoryUpdater = CategoryUpdater(self.transactionSheet, self.categorySheet, self.startingRow, descriptionData)
+        categoryUpdater.updateCategories()
+
 
     def setStartingRow(self):
-        dateColumnValues = self.budgetSheet.col_values(self.DATE_COLUMN_INDEX)
+        # find first empty row in date column
+        dateColumnValues = self.transactionSheet.col_values(self.DATE_COLUMN_INDEX)
         self.startingRow = len(dateColumnValues) + 1
 
     def printDateToSheet(self):
+        # If 'Transaction Date' is in headers, use that for Chase, otherwise use 'Date' for Ally
         try:
             self.headers.index(self.CHASE_DATE_HEADER)
             self.printTransactionColumnToSheet(self.CHASE_DATE_HEADER, self.DATE_COLUMN)
@@ -42,11 +51,15 @@ class BudgetSheetManager:
         self.printTransactionColumnToSheet(self.AMOUNT_HEADER, self.AMOUNT_COLUMN)
     
     def printTransactionColumnToSheet(self, headerName, column):
-        columnIndex = self.headers.index(headerName)
-        columnData = [[row[columnIndex]] for row in self.fileData]
+        columnData = self.getColumnData(headerName)
         range = f'{column}{self.startingRow}:{column}{len(columnData) + self.startingRow}'
         try:
-            self.budgetSheet.update(range, columnData)
+            self.transactionSheet.update(range, columnData)
         except:
             print("Service account did not have edit permissions\nExiting")
             exit()
+    
+    def getColumnData(self, headerName):
+        columnIndex = self.headers.index(headerName)
+        columnData = [[row[columnIndex]] for row in self.fileData]
+        return columnData

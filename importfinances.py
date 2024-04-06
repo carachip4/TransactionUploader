@@ -13,7 +13,7 @@ def main():
     googleSheetReader = GoogleSheetReader()
     googleSheetReader.getGoogleSheet()
 
-    budgetSheetManager = BudgetSheetManager(googleSheetReader.sheet, headers=localFileHandler.headers, data=localFileHandler.fileData)
+    budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet, headers=localFileHandler.headers, data=localFileHandler.fileData)
     budgetSheetManager.printAllDataToSheet()
     
     localFileHandler.confirmFileDeletion()
