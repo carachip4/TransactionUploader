@@ -12,14 +12,18 @@ Go to the service account (IAM & ADMIN, three elipsis on right - manage keys) an
 This should download a file that you should put in the same directory as this one.
 
 Edit the constants.py file with your constants
-WORKSHEET_TITLE is the title on the bottom of your page for the sheet you're using
+TRANSACTION_SHEET_TITLE is the title on the bottom of your page for the sheet you're using to hold transactions
+CATEGORY_SHEET_TITLE is the title on the bottom of your page for the sheet you're using to hold categories
 GOOGLE_SHEET_ID = this will be found in your url e.g. spreadsheets/d/<this-id-here>/edit#gid=
 GOOGLE_API_CREDENTIALS_FILE = the name of the service account key file you downloaded
 
-As a note - this code assumes the following:
+As a note - this code assumes the following from your transaction sheet:
 Date column is in D
 Description column is in F
 Amount column is in G
+ - and the following from your category sheet:
+First category column is C
+Titles are on row 3 with their data listed beneath them
 
 If any of these change for you, you will need to edit the constants at the top of budgetSheetManager accordingly (also DATE_COLUMN_INDEX)
 
