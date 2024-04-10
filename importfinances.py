@@ -14,7 +14,10 @@ def main():
     googleSheetReader.getGoogleSheet()
 
     budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet, headers=localFileHandler.headers, data=localFileHandler.fileData)
-    budgetSheetManager.printAllDataToSheet()
+    budgetSheetManager.printCsvDataToSheet()
+    
+    localFileHandler.settingCategoriesMessage()
+    budgetSheetManager.updateCategories()
     
     localFileHandler.confirmFileDeletion()
 

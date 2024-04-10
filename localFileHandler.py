@@ -85,4 +85,5 @@ class LocalFileHandler:
             raise argparse.ArgumentTypeError('File must have a csv extension')
         return param
         
-    
+    def settingCategoriesMessage(self):
+        print("Setting categories, please wait")

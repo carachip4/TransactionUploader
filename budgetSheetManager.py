@@ -1,3 +1,4 @@
+from dateutil.parser import parse
 from categoryUpdater import CategoryUpdater
 
 # this class handles printing the information from the transaction file on your computer to the google sheet
@@ -20,12 +21,13 @@ class BudgetSheetManager:
         self.startingRow = None
 
 
-    def printAllDataToSheet(self):
+    def printCsvDataToSheet(self):
         self.setStartingRow()
         self.printDateToSheet()
         self.printDescriptionToSheet()
         self.printAmountToSheet()
-
+    
+    def updateCategories(self):
         descriptionData = self.getColumnData(self.DESCRIPTION_HEADER)
         categoryUpdater = CategoryUpdater(self.transactionSheet, self.categorySheet, self.startingRow, descriptionData)
         categoryUpdater.updateCategories()
@@ -40,9 +42,9 @@ class BudgetSheetManager:
         # If 'Transaction Date' is in headers, use that for Chase, otherwise use 'Date' for Ally
         try:
             self.headers.index(self.CHASE_DATE_HEADER)
-            self.printTransactionColumnToSheet(self.CHASE_DATE_HEADER, self.DATE_COLUMN)
+            self.printDateColumnToSheet(self.CHASE_DATE_HEADER, self.DATE_COLUMN)
         except ValueError:
-            self.printTransactionColumnToSheet(self.ALLY_DATE_HEADER, self.DATE_COLUMN)
+            self.printDateColumnToSheet(self.ALLY_DATE_HEADER, self.DATE_COLUMN)
             
     def printDescriptionToSheet(self):
         self.printTransactionColumnToSheet(self.DESCRIPTION_HEADER, self.DESCRIPTION_COLUMN)
@@ -52,14 +54,22 @@ class BudgetSheetManager:
     
     def printTransactionColumnToSheet(self, headerName, column):
         columnData = self.getColumnData(headerName)
-        range = f'{column}{self.startingRow}:{column}{len(columnData) + self.startingRow}'
-        try:
-            self.transactionSheet.update(range, columnData)
-        except:
-            print("Service account did not have edit permissions\nExiting")
-            exit()
+        self.printRangeToSheet(column, columnData)
     
+    def printDateColumnToSheet(self, headerName, column):
+        dateData = self.getColumnData(headerName)
+        standardizedDates = [[parse(date[0]).strftime('%m/%d/%Y')] for date in dateData]
+        self.printRangeToSheet(column, standardizedDates)
+
     def getColumnData(self, headerName):
         columnIndex = self.headers.index(headerName)
         columnData = [[row[columnIndex]] for row in self.fileData]
         return columnData
+    
+    def printRangeToSheet(self, column, columnData):
+        range = f'{column}{self.startingRow}:{column}{len(columnData) + self.startingRow}'
+        try:
+            self.transactionSheet.update(range, columnData)
+        except:
+            print("Service account did not have edit permissions or could not update for a different reason\nExiting")
+            exit()

@@ -1,7 +1,7 @@
 How to use the Finance Importer
 
-Install python and gspread and oauth2client
- - pip install gspread oauth2client
+Install python and gspread and oauth2client and python-dateutil
+ - pip install gspread oauth2client python-dateutil
 
 Navigate to https://console.cloud.google.com/apis/dashboard
 Make a new project (I named mine Import Finances)
