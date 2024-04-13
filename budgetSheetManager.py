@@ -11,21 +11,23 @@ class BudgetSheetManager:
     DESCRIPTION_COLUMN = "F"
     AMOUNT_HEADER = "Amount"
     AMOUNT_COLUMN = "G"
+    DETAILS_COLUMN = "H"
 
-
-    def __init__(self, transactionSheet, categorySheet, headers, data):
+    def __init__(self, transactionSheet, categorySheet, headers, data, fileSource):
         self.transactionSheet = transactionSheet
         self.categorySheet = categorySheet
         self.headers = headers
         self.fileData = data
         self.startingRow = None
-
+        self.fileSource = fileSource
+        self.transactionDataLength = 0
 
     def printCsvDataToSheet(self):
         self.setStartingRow()
         self.printDateToSheet()
         self.printDescriptionToSheet()
         self.printAmountToSheet()
+        self.printSource()
     
     def updateCategories(self):
         descriptionData = self.getColumnData(self.DESCRIPTION_HEADER)
@@ -50,26 +52,56 @@ class BudgetSheetManager:
         self.printTransactionColumnToSheet(self.DESCRIPTION_HEADER, self.DESCRIPTION_COLUMN)
     
     def printAmountToSheet(self):
-        self.printTransactionColumnToSheet(self.AMOUNT_HEADER, self.AMOUNT_COLUMN)
-    
-    def printTransactionColumnToSheet(self, headerName, column):
-        columnData = self.getColumnData(headerName)
-        self.printRangeToSheet(column, columnData)
+        self.applyFormatToIncomeValues()
+        self.printTransactionColumnToSheet(self.AMOUNT_HEADER, self.AMOUNT_COLUMN, absoluteValue=True)
     
     def printDateColumnToSheet(self, headerName, column):
         dateData = self.getColumnData(headerName)
         standardizedDates = [[parse(date[0]).strftime('%m/%d/%Y')] for date in dateData]
-        self.printRangeToSheet(column, standardizedDates)
+        rangeToUpdate = self.getColumnRange(column, len(standardizedDates))
+        self.printRangeToSheet(rangeToUpdate, standardizedDates)
 
-    def getColumnData(self, headerName):
+    def printTransactionColumnToSheet(self, headerName, column, absoluteValue = False):
+        columnData = self.getColumnData(headerName, absoluteValue)
+        self.transactionDataLength = len(columnData)
+        rangeToUpdate = self.getColumnRange(column, len(columnData))
+        self.printRangeToSheet(rangeToUpdate, columnData)
+
+    def getColumnData(self, headerName, absoluteValue = False):
         columnIndex = self.headers.index(headerName)
-        columnData = [[row[columnIndex]] for row in self.fileData]
+        if absoluteValue:
+            columnData = [[abs(float(row[columnIndex]))] for row in self.fileData]
+        else:
+            columnData = [[row[columnIndex]] for row in self.fileData]
         return columnData
     
-    def printRangeToSheet(self, column, columnData):
-        range = f'{column}{self.startingRow}:{column}{len(columnData) + self.startingRow}'
+    def printSource(self):
+        if (self.fileSource):
+            rangeToUpdate = f'{self.DETAILS_COLUMN}{self.startingRow}:{self.DETAILS_COLUMN}{self.transactionDataLength + self.startingRow}'
+            data = [[self.fileSource] for _ in range(self.transactionDataLength)]
+            self.printRangeToSheet(rangeToUpdate, data)
+            
+
+    def getColumnRange(self, column, dataLength):
+        return f'{column}{self.startingRow}:{column}{dataLength + self.startingRow}'
+    
+    def printRangeToSheet(self, rangeToUpdate, columnData):
         try:
-            self.transactionSheet.update(range, columnData)
-        except:
-            print("Service account did not have edit permissions or could not update for a different reason\nExiting")
+            self.transactionSheet.update(rangeToUpdate, columnData, value_input_option="USER_ENTERED")
+        except Exception as ex:
+            print(ex)
+            # print("Service account did not have edit permissions or could not update for a different reason\nExiting")
+            exit()
+    
+    def applyFormatToIncomeValues(self):
+        incomeCells = []
+        columnData = self.getColumnData(self.AMOUNT_HEADER)
+        for i in range(len(columnData)):
+            if float(columnData[i][0]) > 0:
+                incomeCells.append(f"{self.AMOUNT_COLUMN}{i + self.startingRow}")
+
+        try:
+            self.transactionSheet.format(incomeCells, {"textFormat": {"bold": True}})
+        except Exception as ex:
+            print(ex)
             exit()

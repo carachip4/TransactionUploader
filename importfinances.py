@@ -13,7 +13,7 @@ def main():
     googleSheetReader = GoogleSheetReader()
     googleSheetReader.getGoogleSheet()
 
-    budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet, headers=localFileHandler.headers, data=localFileHandler.fileData)
+    budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet, headers=localFileHandler.headers, data=localFileHandler.fileData, fileSource=localFileHandler.fileSource)
     budgetSheetManager.printCsvDataToSheet()
     
     localFileHandler.settingCategoriesMessage()

@@ -12,14 +12,17 @@ class LocalFileHandler:
 
     def __init__(self):
         self.filename = ""
+        self.fileSource = ""
         self.headers = None
         self.fileData = None
 
     def openFile(self):
         self.getFileName()
         self.confirmFileSelection()
+        self.requestFileSource()
 
         with open(self.filename, 'r') as file:
+            print("Reading file...")
             csv_data = csv.reader(file)
             data = list(csv_data)
             self.headers = [header.strip() for header in data[0]]
@@ -31,6 +34,9 @@ class LocalFileHandler:
             self.filename = args.filename
         else:
             self.filename = self.getMostRecentFileFromDownloads()
+    
+    def requestFileSource(self):
+        self.fileSource = input("Would you like to provide a source? (Enter to skip)\n")
 
     def confirmFileSelection(self):
         validReadFromFileInput = False
@@ -40,7 +46,6 @@ class LocalFileHandler:
                 print("Will not read file.")
                 self.exitScript()
             elif readFromFile in self.YES_INPUT_OPTIONS:
-                print("Reading file...")
                 validReadFromFileInput = True
             else:
                 print("Invalid option")
