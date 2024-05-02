@@ -25,6 +25,9 @@ class LocalFileHandler:
             print("Reading file...")
             csv_data = csv.reader(file)
             data = list(csv_data)
+            if not data:
+                self.confirmFileDeletion(empty=True)
+                self.exitScript()
             self.headers = [header.strip() for header in data[0]]
             self.fileData = data[1:]
 
@@ -50,8 +53,12 @@ class LocalFileHandler:
             else:
                 print("Invalid option")
 
-    def confirmFileDeletion(self):
-        deleteFile = input(f"Finished reading from file.\nWould you like to now delete {self.filename}?").lower()
+    def confirmFileDeletion(self, empty = False):
+        if not empty:
+            print("Finished reading from file")
+        else:
+            print("File was empty.")
+        deleteFile = input(f"Would you like to delete {self.filename}?").lower()
         if deleteFile in self.YES_INPUT_OPTIONS:
             os.remove(self.filename)
             print("File deleted.")
@@ -81,7 +88,7 @@ class LocalFileHandler:
 
     def parseArguments(self):
         parser = argparse.ArgumentParser(description="Import budget transactional data into google sheets.")
-        parser.add_argument("--filename", type=self.csv_file, help="Name of the file to be imported.")
+        parser.add_argument("--filename", type=self.csv_file, default=None, help="Name of the file to be imported.")
         return parser.parse_args()
 
     def csv_file(self, param):

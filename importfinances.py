@@ -7,19 +7,24 @@ from googleSheetReader import GoogleSheetReader
 # 2. Open your google sheet
 # 3. Print the transaction data to the sheet
 def main():
-    localFileHandler = LocalFileHandler()
-    localFileHandler.openFile()
-    
-    googleSheetReader = GoogleSheetReader()
-    googleSheetReader.getGoogleSheet()
+    try:
+        localFileHandler = LocalFileHandler()
+        localFileHandler.openFile()
+        
+        googleSheetReader = GoogleSheetReader()
+        googleSheetReader.getGoogleSheet()
 
-    budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet, headers=localFileHandler.headers, data=localFileHandler.fileData, fileSource=localFileHandler.fileSource)
-    budgetSheetManager.printCsvDataToSheet()
-    
-    localFileHandler.settingCategoriesMessage()
-    budgetSheetManager.updateCategories()
-    
-    localFileHandler.confirmFileDeletion()
+        budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet, headers=localFileHandler.headers, data=localFileHandler.fileData, fileSource=localFileHandler.fileSource)
+        budgetSheetManager.printCsvDataToSheet()
+        
+        localFileHandler.settingCategoriesMessage()
+        budgetSheetManager.updateCategories()
+        
+        localFileHandler.confirmFileDeletion()
+    except Exception as ex:
+        print(ex)
+    finally:
+        input("")
 
 if __name__ == '__main__':
     main()

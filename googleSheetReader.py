@@ -1,4 +1,5 @@
 import gspread
+import os
 from oauth2client.service_account import ServiceAccountCredentials
 from constants import GOOGLE_SHEET_ID, GOOGLE_API_CREDENTIALS_FILE, TRANSACTION_SHEET_TITLE, CATEGORY_SHEET_TITLE
 
@@ -24,6 +25,8 @@ class GoogleSheetReader:
 
     def authenticateCredentials(self):
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_API_CREDENTIALS_FILE, scope)
+        currentDirectory = os.path.dirname(os.path.realpath(__file__))
+        pathToCredentialsFile = os.path.join(currentDirectory, GOOGLE_API_CREDENTIALS_FILE)
+        creds = ServiceAccountCredentials.from_json_keyfile_name(pathToCredentialsFile, scope)
         self.client = gspread.authorize(creds)
         

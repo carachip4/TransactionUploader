@@ -101,7 +101,8 @@ class BudgetSheetManager:
                 incomeCells.append(f"{self.AMOUNT_COLUMN}{i + self.startingRow}")
 
         try:
-            self.transactionSheet.format(incomeCells, {"textFormat": {"bold": True}})
+            if len(incomeCells) > 0:
+                self.transactionSheet.format(incomeCells, {"textFormat": {"bold": True}})
         except Exception as ex:
             print(ex)
             exit()
