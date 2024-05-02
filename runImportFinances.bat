@@ -1,0 +1,1 @@
+start python "C:\path\to\importfinances.py"
