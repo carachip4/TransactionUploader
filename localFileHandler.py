@@ -69,7 +69,6 @@ class LocalFileHandler:
 
 
     def exitScript(self):
-        print('Exiting')
         sys.exit(1)
 
     def getMostRecentFileFromDownloads(self):
@@ -99,3 +98,9 @@ class LocalFileHandler:
         
     def settingCategoriesMessage(self):
         print("Setting categories, please wait")
+
+    def shouldReadAnotherFile(self):
+        readAnother = input("Would you like to try to upload another file?").lower()
+        if readAnother in self.YES_INPUT_OPTIONS:
+            return True
+        return False
