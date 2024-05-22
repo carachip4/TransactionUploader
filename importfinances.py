@@ -7,6 +7,7 @@ from googleSheetReader import GoogleSheetReader
 # 2. Open your google sheet
 # 3. Print the transaction data to the sheet
 def main():
+    continueToRead = True
     try:
         localFileHandler = LocalFileHandler()
         localFileHandler.openFile()
@@ -21,10 +22,19 @@ def main():
         budgetSheetManager.updateCategories()
         
         localFileHandler.confirmFileDeletion()
+
+        continueToRead = localFileHandler.shouldReadAnotherFile()
+    except SystemExit as ex:
+        print("Exiting")
+        input("")
+        continueToRead = False
     except Exception as ex:
         print(ex)
-    finally:
         input("")
+    finally:
+        return continueToRead
 
 if __name__ == '__main__':
-    main()
+    continueToRead = True
+    while continueToRead:
+        continueToRead = main()
