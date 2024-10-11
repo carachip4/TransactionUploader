@@ -1,3 +1,10 @@
+# Overview
+The purpose of this application is to simplify the process of importing bank and credit card transactions into Google Sheets for budgeting. The steps below will walk you through how to install and use the Python script that will easily be able to read transaction data from CSV files and automatically popuplate a Google Sheet with relevant details such as name, date, and amount.
+
+## Key Features
+- <b>Automated Data Import</b>: Download your transaction CSV, run the script, and import data into your Google Sheet without manual entry.
+- <b>Transaction Categorization</b>: Set up a dedicated tab for category names in your Google Sheet, allowing the script to automatically categorize transactions based on predifined names (e.g. tagging "Walmart", "Costco", or "Target" as "Groceries")
+
 # How to use the Finance Importer
 
 ## Required Installations
