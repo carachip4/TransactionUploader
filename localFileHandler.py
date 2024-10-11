@@ -2,7 +2,7 @@ import argparse
 import csv
 import glob
 import os
-import sys
+from ExitException import Exit
 
 #This class will find the most recently downloaded csv file and will verify with the user to use that file and to delete it when done
 class LocalFileHandler:
@@ -74,7 +74,7 @@ class LocalFileHandler:
 
 
     def exitScript(self):
-        sys.exit(1)
+        raise Exit
 
     def getMostRecentFileFromDownloads(self):
         downloads_path = os.path.join(os.getenv('USERPROFILE'), 'Downloads')

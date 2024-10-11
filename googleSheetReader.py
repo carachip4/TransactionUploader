@@ -2,6 +2,7 @@ import gspread
 import os
 from oauth2client.service_account import ServiceAccountCredentials
 from constants import GOOGLE_SHEET_ID, GOOGLE_API_CREDENTIALS_FILE, TRANSACTION_SHEET_TITLE, CATEGORY_SHEET_TITLE
+from ExitException import Exit
 
 #This class authenticates with google and finds your google sheet
 class GoogleSheetReader:
@@ -20,7 +21,7 @@ class GoogleSheetReader:
             self.categorySheet = spreadsheet.worksheet(CATEGORY_SHEET_TITLE)
         except:
             print("You have not hooked up the correct document or have not yet shared it with the service_account email")
-            quit()
+            raise Exit
             
 
     def authenticateCredentials(self):
