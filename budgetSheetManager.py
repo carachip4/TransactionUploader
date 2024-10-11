@@ -1,5 +1,6 @@
 from dateutil.parser import parse
 from categoryUpdater import CategoryUpdater
+from ExitException import Exit
 
 # this class handles printing the information from the transaction file on your computer to the google sheet
 class BudgetSheetManager:
@@ -91,7 +92,7 @@ class BudgetSheetManager:
         except Exception as ex:
             print(ex)
             # print("Service account did not have edit permissions or could not update for a different reason\nExiting")
-            exit()
+            raise Exit
     
     def applyFormatToIncomeValues(self):
         incomeCells = []
@@ -105,4 +106,4 @@ class BudgetSheetManager:
                 self.transactionSheet.format(incomeCells, {"textFormat": {"bold": True}})
         except Exception as ex:
             print(ex)
-            exit()
+            raise Exit

@@ -1,6 +1,7 @@
 from budgetSheetManager import BudgetSheetManager
 from localFileHandler import LocalFileHandler
 from googleSheetReader import GoogleSheetReader
+from ExitException import Exit
 
 #This file will create classes to 
 # 1. Open your transaction file
@@ -24,14 +25,11 @@ def main():
         localFileHandler.confirmFileDeletion()
 
         continueToRead = localFileHandler.shouldReadAnotherFile()
-    except SystemExit as ex:
+    except Exit as ex:
         continueToRead = False
-        print("Exiting")
-        input("")
     except Exception as ex:
         continueToRead = False
         print(ex)
-        input("")
     finally:
         return continueToRead
 
@@ -39,3 +37,4 @@ if __name__ == '__main__':
     continueToRead = True
     while continueToRead:
         continueToRead = main()
+    input("Press enter to exit")

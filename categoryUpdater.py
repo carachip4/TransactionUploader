@@ -1,3 +1,5 @@
+from ExitException import Exit
+
 #This class will update the categories based on matches to categories found in your Category sheet
 class CategoryUpdater:
     TRANSACTION_CATEGORY_COLUMN = 'C'
@@ -33,7 +35,7 @@ class CategoryUpdater:
             self.transactionSheet.update(rangeToUpdate, categoriesToSet)
         except:
             print("Service account did not have edit permissions or could not update for a different reason\nExiting")
-            exit()
+            raise Exit
 
     def findCategory(self, description):
         if not description:
