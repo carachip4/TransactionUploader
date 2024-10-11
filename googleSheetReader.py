@@ -19,7 +19,7 @@ class GoogleSheetReader:
             self.transactionSheet = spreadsheet.worksheet(TRANSACTION_SHEET_TITLE)
             self.categorySheet = spreadsheet.worksheet(CATEGORY_SHEET_TITLE)
         except:
-            print("You have not hooked up the correct document or have not yet shared it with the service_account email\nExiting")
+            print("You have not hooked up the correct document or have not yet shared it with the service_account email")
             quit()
             
 

@@ -41,7 +41,7 @@ class BudgetSheetManager:
         self.startingRow = len(dateColumnValues) + 1
 
     def printDateToSheet(self):
-        # If 'Transaction Date' is in headers, use that for Chase, otherwise use 'Date' for Ally
+        # If 'Transaction Date' is in headers, use that for Chase, otherwise use 'Date' for Ally (and WellsFargo)
         try:
             self.headers.index(self.CHASE_DATE_HEADER)
             self.printDateColumnToSheet(self.CHASE_DATE_HEADER, self.DATE_COLUMN)

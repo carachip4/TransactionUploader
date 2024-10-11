@@ -25,10 +25,11 @@ def main():
 
         continueToRead = localFileHandler.shouldReadAnotherFile()
     except SystemExit as ex:
+        continueToRead = False
         print("Exiting")
         input("")
-        continueToRead = False
     except Exception as ex:
+        continueToRead = False
         print(ex)
         input("")
     finally:

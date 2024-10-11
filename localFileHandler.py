@@ -28,8 +28,13 @@ class LocalFileHandler:
             if not data:
                 self.confirmFileDeletion(empty=True)
                 self.exitScript()
-            self.headers = [header.strip() for header in data[0]]
-            self.fileData = data[1:]
+            # WellsFargo does not have headers
+            if "CreditCard1" in self.filename:
+                self.headers = ["Date","Amount", "", "", "Description"]
+                self.fileData = data
+            else:
+                self.headers = [header.strip() for header in data[0]]
+                self.fileData = data[1:]
 
     def getFileName(self):
         args = self.parseArguments()
