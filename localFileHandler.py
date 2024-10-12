@@ -32,8 +32,11 @@ class LocalFileHandler:
             if "CreditCard1" in self.filename:
                 self.headers = ["Date","Amount", "", "", "Description"]
                 self.fileData = data
+            elif "Chase" in self.filename:
+                self.headers = ["Date", "", "Description", "", "", "Amount", ""]
+                self.fileData = data[1:]
             else:
-                self.headers = [header.strip() for header in data[0]]
+                self.headers = ["Date", "", "Amount", "", "Description"]
                 self.fileData = data[1:]
 
     def getFileName(self):

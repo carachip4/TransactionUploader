@@ -4,8 +4,7 @@ from ExitException import Exit
 
 # this class handles printing the information from the transaction file on your computer to the google sheet
 class BudgetSheetManager:
-    CHASE_DATE_HEADER = "Transaction Date"
-    ALLY_DATE_HEADER = "Date"
+    DATE_HEADER = "Date"
     DATE_COLUMN = "D"
     DATE_COLUMN_INDEX = 4
     DESCRIPTION_HEADER = "Description"
@@ -25,7 +24,7 @@ class BudgetSheetManager:
 
     def printCsvDataToSheet(self):
         self.setStartingRow()
-        self.printDateToSheet()
+        self.printDateColumnToSheet()
         self.printDescriptionToSheet()
         self.printAmountToSheet()
         self.printSource()
@@ -40,14 +39,6 @@ class BudgetSheetManager:
         # find first empty row in date column
         dateColumnValues = self.transactionSheet.col_values(self.DATE_COLUMN_INDEX)
         self.startingRow = len(dateColumnValues) + 1
-
-    def printDateToSheet(self):
-        # If 'Transaction Date' is in headers, use that for Chase, otherwise use 'Date' for Ally (and WellsFargo)
-        try:
-            self.headers.index(self.CHASE_DATE_HEADER)
-            self.printDateColumnToSheet(self.CHASE_DATE_HEADER, self.DATE_COLUMN)
-        except ValueError:
-            self.printDateColumnToSheet(self.ALLY_DATE_HEADER, self.DATE_COLUMN)
             
     def printDescriptionToSheet(self):
         self.printTransactionColumnToSheet(self.DESCRIPTION_HEADER, self.DESCRIPTION_COLUMN)
@@ -56,10 +47,10 @@ class BudgetSheetManager:
         self.applyFormatToIncomeValues()
         self.printTransactionColumnToSheet(self.AMOUNT_HEADER, self.AMOUNT_COLUMN, absoluteValue=True)
     
-    def printDateColumnToSheet(self, headerName, column):
-        dateData = self.getColumnData(headerName)
+    def printDateColumnToSheet(self):
+        dateData = self.getColumnData(self.DATE_HEADER)
         standardizedDates = [[parse(date[0]).strftime('%m/%d/%Y')] for date in dateData]
-        rangeToUpdate = self.getColumnRange(column, len(standardizedDates))
+        rangeToUpdate = self.getColumnRange(self.DATE_COLUMN, len(standardizedDates))
         self.printRangeToSheet(rangeToUpdate, standardizedDates)
 
     def printTransactionColumnToSheet(self, headerName, column, absoluteValue = False):
