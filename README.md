@@ -73,3 +73,7 @@ To run, open gitbash and navigate to the directory. This terminal view is very s
 
 ### *Finding a File or Folders Path
 Find the file in file explorer and then click on the top bar that shows the breadcrumb trail pointing to your current location. That should then highlight the current path which you can copy and paste
+
+#### TODO
+Can only do about 4 google requests per minute, wait until done with all files and then write to drive all at once to use fewer writes
+If fail at any point, loop back to start instead of quitting
