@@ -1,8 +1,9 @@
-import argparse
 import csv
 import glob
 import os
+import argparse
 from ExitException import Exit
+from FileDetails import FileDetails
 
 #This class will find the most recently downloaded csv file and will verify with the user to use that file and to delete it when done
 class LocalFileHandler:
@@ -11,48 +12,67 @@ class LocalFileHandler:
     YES_INPUT_OPTIONS = ['', 'yes', 'y']
 
     def __init__(self):
-        self.filename = ""
-        self.fileSource = ""
-        self.headers = None
-        self.fileData = None
+        self.fileDetails = []
+        self.parsedFileFromArguments = False
 
-    def openFile(self):
-        self.getFileName()
-        self.confirmFileSelection()
-        self.requestFileSource()
-
-        with open(self.filename, 'r') as file:
+    def openFileAndSetData(self):
+        fileName = self.getFileName()
+        self.confirmFileSelection(fileName)
+        # fileSource = self.requestFileSource() # can keep over here if file type is uncertain
+        
+        with open(fileName, 'r') as file:
             print("Reading file...")
             csv_data = csv.reader(file)
             data = list(csv_data)
             if not data:
-                self.confirmFileDeletion(empty=True)
+                print("File is empty.")
                 self.exitScript()
             # WellsFargo does not have headers
-            if "CreditCard1" in self.filename:
-                self.headers = ["Date","Amount", "", "", "Description"]
-                self.fileData = data
-            elif "Chase" in self.filename:
-                self.headers = ["Date", "", "Description", "", "", "Amount", ""]
-                self.fileData = data[1:]
+            if "CreditCard1" in fileName:
+                fileSource = "WellsFargo"
+                # fileHeaders = ["Date","Amount", "", "", "Description"]
+                dateIndex = 0
+                amountIndex = 1
+                descriptionIndex = 4
+                fileData = data
+            elif "Chase" in fileName:
+                fileSource = "Chase"
+                # fileHeaders = ["Date", "", "Description", "", "", "Amount", ""]
+                dateIndex = 0
+                amountIndex = 5
+                descriptionIndex = 2
+                fileData = data[1:]
             else:
-                self.headers = ["Date", "", "Amount", "", "Description"]
-                self.fileData = data[1:]
+                fileSource = self.requestFileSource()
+                # fileHeaders = ["Date", "", "Amount", "", "Description"]
+                dateIndex = 0
+                amountIndex = 2
+                descriptionIndex = 4
+                fileData = data[1:]
+            dates = self.getColumnData(dateIndex, fileData)
+            amounts = self.getColumnData(amountIndex, fileData)
+            descriptions = self.getColumnData(descriptionIndex, fileData)
+
+        self.fileDetails.append(FileDetails(fileName, fileSource, dates, amounts, descriptions))
+
+    def getColumnData(self, columnIndex, fileData):
+        return [[row[columnIndex]] for row in fileData]
 
     def getFileName(self):
         args = self.parseArguments()
         if args.filename:
+            self.parsedFileFromArguments = True
             self.filename = args.filename
         else:
-            self.filename = self.getMostRecentFileFromDownloads()
+            return self.getMostRecentFileFromDownloads()
     
     def requestFileSource(self):
-        self.fileSource = input("Would you like to provide a source? (Enter to skip)\n")
+        return input("Would you like to provide a source? (Enter to skip)\n")
 
-    def confirmFileSelection(self):
+    def confirmFileSelection(self, fileName):
         validReadFromFileInput = False
         while not validReadFromFileInput:
-            readFromFile = input(f"Read from file {self.filename}?").lower()
+            readFromFile = input(f"Read from file {fileName}?").lower()
             if readFromFile in self.NO_INPUT_OPTIONS:
                 print("Will not read file.")
                 self.exitScript()
@@ -61,15 +81,12 @@ class LocalFileHandler:
             else:
                 print("Invalid option")
 
-    def confirmFileDeletion(self, empty = False):
-        if not empty:
-            print("Finished reading from file")
-        else:
-            print("File was empty.")
-        deleteFile = input(f"Would you like to delete {self.filename}?").lower()
+    def confirmFileDeletion(self):
+        deleteFile = input(f"Would you like to delete csv files?").lower()
         if deleteFile in self.YES_INPUT_OPTIONS:
-            os.remove(self.filename)
-            print("File deleted.")
+            for fileDetails in self.fileDetails:
+                os.remove(fileDetails.fileName)
+                print(f'{fileDetails.fileName} deleted.')
         elif deleteFile in self.NO_INPUT_OPTIONS:
             print("Will not delete file.")
         else:
@@ -86,8 +103,9 @@ class LocalFileHandler:
         allCsvFiles = [file for file in allDownloadFiles if os.path.splitext(file)[1].lower() == '.csv']
         allCsvFiles.sort(key=lambda x: os.path.getmtime(x), reverse=True)
         
-        if allCsvFiles:
-            return allCsvFiles[0]
+        numberOfFilesRead = len(self.fileDetails)
+        if allCsvFiles and numberOfFilesRead < len(allCsvFiles):
+            return allCsvFiles[numberOfFilesRead]
         else:
             print(f"No csv files found in {downloads_path}")
             self.exitScript()
@@ -103,11 +121,10 @@ class LocalFileHandler:
         if ext.lower() != '.csv':
             raise argparse.ArgumentTypeError('File must have a csv extension')
         return param
-        
-    def settingCategoriesMessage(self):
-        print("Setting categories, please wait")
 
     def shouldReadAnotherFile(self):
+        if self.parsedFileFromArguments:
+            return False
         readAnother = input("Would you like to try to upload another file?").lower()
         if readAnother in self.YES_INPUT_OPTIONS:
             return True

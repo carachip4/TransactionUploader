@@ -4,37 +4,35 @@ from googleSheetReader import GoogleSheetReader
 from ExitException import Exit
 
 #This file will create classes to 
-# 1. Open your transaction file
-# 2. Open your google sheet
+# 1. Open your google sheet
+# 2. Open your transaction file(s)
 # 3. Print the transaction data to the sheet
 def main():
-    continueToRead = True
-    try:
-        localFileHandler = LocalFileHandler()
-        localFileHandler.openFile()
-        
+    try :
         googleSheetReader = GoogleSheetReader()
         googleSheetReader.getGoogleSheet()
 
-        budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet, headers=localFileHandler.headers, data=localFileHandler.fileData, fileSource=localFileHandler.fileSource)
-        budgetSheetManager.printCsvDataToSheet()
-        
-        localFileHandler.settingCategoriesMessage()
-        budgetSheetManager.updateCategories()
-        
-        localFileHandler.confirmFileDeletion()
-
-        continueToRead = localFileHandler.shouldReadAnotherFile()
-    except Exit as ex:
-        continueToRead = False
+        budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet)
+        localFileHandler = LocalFileHandler()    
     except Exception as ex:
-        continueToRead = False
         print(ex)
-    finally:
-        return continueToRead
+        return
 
-if __name__ == '__main__':
     continueToRead = True
     while continueToRead:
-        continueToRead = main()
+        try:
+            localFileHandler.openFileAndSetData()
+            continueToRead = localFileHandler.shouldReadAnotherFile()
+        except Exit as ex:
+            continueToRead = localFileHandler.shouldReadAnotherFile()
+        except Exception as ex:
+            print(ex)
+            return
+    budgetSheetManager.setFileData(localFileHandler.fileDetails)
+    budgetSheetManager.printCsvDataToSheet()
+    budgetSheetManager.updateCategories()
+    localFileHandler.confirmFileDeletion()
+
+if __name__ == '__main__':
+    main()
     input("Press enter to exit")
