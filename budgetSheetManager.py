@@ -4,75 +4,54 @@ from ExitException import Exit
 
 # this class handles printing the information from the transaction file on your computer to the google sheet
 class BudgetSheetManager:
-    DATE_HEADER = "Date"
     DATE_COLUMN = "D"
     DATE_COLUMN_INDEX = 4
-    DESCRIPTION_HEADER = "Description"
     DESCRIPTION_COLUMN = "F"
-    AMOUNT_HEADER = "Amount"
     AMOUNT_COLUMN = "G"
     DETAILS_COLUMN = "H"
 
-    def __init__(self, transactionSheet, categorySheet, headers, data, fileSource):
+    def __init__(self, transactionSheet, categorySheet):
         self.transactionSheet = transactionSheet
         self.categorySheet = categorySheet
-        self.headers = headers
-        self.fileData = data
         self.startingRow = None
-        self.fileSource = fileSource
-        self.transactionDataLength = 0
+        self.fileNames = []
+        self.fileDates = []
+        self.fileAmounts = []
+        self.fileDescriptions = []
+        self.fileSources = []
+
+    # Handle all at once to minimize number of writes since google services has a limit per minute
+    def setFileData(self, fileDetails):
+        for fileDetail in fileDetails:
+            self.fileNames.append(fileDetail.fileName)
+            self.fileDates.extend([parse(date[0]).strftime('%m/%d/%Y')] for date in fileDetail.dates)
+            self.fileAmounts.extend(fileDetail.amounts)
+            self.fileDescriptions.extend(fileDetail.descriptions)
+            self.fileSources.extend([fileDetail.source] for i in range(len(fileDetail.dates)))
 
     def printCsvDataToSheet(self):
         self.setStartingRow()
-        self.printDateColumnToSheet()
-        self.printDescriptionToSheet()
-        self.printAmountToSheet()
-        self.printSource()
-    
-    def updateCategories(self):
-        descriptionData = self.getColumnData(self.DESCRIPTION_HEADER)
-        categoryUpdater = CategoryUpdater(self.transactionSheet, self.categorySheet, self.startingRow, descriptionData)
-        categoryUpdater.updateCategories()
+        self.applyFormatToIncomeValues()
+        self.convertAmountsToAbsoluteValues()
 
+        self.printColumn(self.DATE_COLUMN, self.fileDates)
+        self.printColumn(self.DESCRIPTION_COLUMN, self.fileDescriptions)
+        self.printColumn(self.AMOUNT_COLUMN, self.fileAmounts)
+        self.printColumn(self.DETAILS_COLUMN, self.fileSources)
+
+    def updateCategories(self):
+        print("Setting categories, please wait")
+        categoryUpdater = CategoryUpdater(self.transactionSheet, self.categorySheet, self.startingRow, self.fileDescriptions)
+        categoryUpdater.updateCategories()
 
     def setStartingRow(self):
         # find first empty row in date column
         dateColumnValues = self.transactionSheet.col_values(self.DATE_COLUMN_INDEX)
         self.startingRow = len(dateColumnValues) + 1
             
-    def printDescriptionToSheet(self):
-        self.printTransactionColumnToSheet(self.DESCRIPTION_HEADER, self.DESCRIPTION_COLUMN)
-    
-    def printAmountToSheet(self):
-        self.applyFormatToIncomeValues()
-        self.printTransactionColumnToSheet(self.AMOUNT_HEADER, self.AMOUNT_COLUMN, absoluteValue=True)
-    
-    def printDateColumnToSheet(self):
-        dateData = self.getColumnData(self.DATE_HEADER)
-        standardizedDates = [[parse(date[0]).strftime('%m/%d/%Y')] for date in dateData]
-        rangeToUpdate = self.getColumnRange(self.DATE_COLUMN, len(standardizedDates))
-        self.printRangeToSheet(rangeToUpdate, standardizedDates)
-
-    def printTransactionColumnToSheet(self, headerName, column, absoluteValue = False):
-        columnData = self.getColumnData(headerName, absoluteValue)
-        self.transactionDataLength = len(columnData)
-        rangeToUpdate = self.getColumnRange(column, len(columnData))
-        self.printRangeToSheet(rangeToUpdate, columnData)
-
-    def getColumnData(self, headerName, absoluteValue = False):
-        columnIndex = self.headers.index(headerName)
-        if absoluteValue:
-            columnData = [[abs(float(row[columnIndex]))] for row in self.fileData]
-        else:
-            columnData = [[row[columnIndex]] for row in self.fileData]
-        return columnData
-    
-    def printSource(self):
-        if (self.fileSource):
-            rangeToUpdate = f'{self.DETAILS_COLUMN}{self.startingRow}:{self.DETAILS_COLUMN}{self.transactionDataLength + self.startingRow}'
-            data = [[self.fileSource] for _ in range(self.transactionDataLength)]
-            self.printRangeToSheet(rangeToUpdate, data)
-            
+    def printColumn(self, header, data):
+        rangeToUpdate = self.getColumnRange(header, len(data))
+        self.printRangeToSheet(rangeToUpdate, data)     
 
     def getColumnRange(self, column, dataLength):
         return f'{column}{self.startingRow}:{column}{dataLength + self.startingRow}'
@@ -87,9 +66,8 @@ class BudgetSheetManager:
     
     def applyFormatToIncomeValues(self):
         incomeCells = []
-        columnData = self.getColumnData(self.AMOUNT_HEADER)
-        for i in range(len(columnData)):
-            if float(columnData[i][0]) > 0:
+        for i in range(len(self.fileAmounts)):
+            if float(self.fileAmounts[i][0]) > 0:
                 incomeCells.append(f"{self.AMOUNT_COLUMN}{i + self.startingRow}")
 
         try:
@@ -98,3 +76,6 @@ class BudgetSheetManager:
         except Exception as ex:
             print(ex)
             raise Exit
+    
+    def convertAmountsToAbsoluteValues(self):
+        self.fileAmounts = [[abs(float(amount[0]))] for amount in self.fileAmounts]
