@@ -59,7 +59,7 @@ If they do not, we may need to write some custom code for your file
 There are two options for running the script. The first option will be to drag a file to your Desktop and then you can double click to run it. The second is to run it directly from the command line. 
 
 ### Desktop App
-Edit `runImportFinances.bat` and put in the *path to the importfinances.py to your Desktop and you can double click from there. Note: you can only specify your file manually if you run this script from a terminal
+Edit `runImportFinances.bat` and put in the *path to the importfinances.py to your Desktop and you can double click from there. Note: you can only specify the downloaded file you want to run the script on if you run this script from a terminal
 
 ### Running Manually
 This will be easier if you download gitbash (https://git-scm.com/downloads) which is a Unix based terminal
@@ -73,3 +73,6 @@ To run, open gitbash and navigate to the directory. This terminal view is very s
 
 ### *Finding a File or Folders Path
 Find the file in file explorer and then click on the top bar that shows the breadcrumb trail pointing to your current location. That should then highlight the current path which you can copy and paste
+
+#### TODO
+If fail at any point, loop back to start instead of quitting
