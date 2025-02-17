@@ -14,24 +14,24 @@ def main():
 
         budgetSheetManager = BudgetSheetManager(googleSheetReader.transactionSheet, googleSheetReader.categorySheet)
         localFileHandler = LocalFileHandler()    
+
+        continueToRead = True
+        while continueToRead:
+            try:
+                localFileHandler.openFileAndSetData()
+                continueToRead = localFileHandler.shouldReadAnotherFile()
+            except Exit as ex:
+                continueToRead = localFileHandler.shouldReadAnotherFile()
+            except Exception as ex:
+                print(ex)
+                return
+        budgetSheetManager.setFileData(localFileHandler.fileDetails)
+        budgetSheetManager.printCsvDataToSheet()
+        budgetSheetManager.updateCategories()
+        localFileHandler.confirmFileDeletion()
     except Exception as ex:
         print(ex)
         return
-
-    continueToRead = True
-    while continueToRead:
-        try:
-            localFileHandler.openFileAndSetData()
-            continueToRead = localFileHandler.shouldReadAnotherFile()
-        except Exit as ex:
-            continueToRead = localFileHandler.shouldReadAnotherFile()
-        except Exception as ex:
-            print(ex)
-            return
-    budgetSheetManager.setFileData(localFileHandler.fileDetails)
-    budgetSheetManager.printCsvDataToSheet()
-    budgetSheetManager.updateCategories()
-    localFileHandler.confirmFileDeletion()
 
 if __name__ == '__main__':
     main()
