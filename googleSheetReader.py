@@ -17,10 +17,14 @@ class GoogleSheetReader:
         self.authenticateCredentials()
         try:
             spreadsheet = self.client.open_by_key(GOOGLE_SHEET_ID)
+        except:
+            print("You have not hooked up the correct document or have not yet shared it with the service_account email")
+            raise Exit
+        try:
             self.transactionSheet = spreadsheet.worksheet(TRANSACTION_SHEET_TITLE)
             self.categorySheet = spreadsheet.worksheet(CATEGORY_SHEET_TITLE)
         except:
-            print("You have not hooked up the correct document or have not yet shared it with the service_account email")
+            print(f"Cannot find either '{TRANSACTION_SHEET_TITLE}' or '{CATEGORY_SHEET_TITLE}' in your google sheet")
             raise Exit
             
 
