@@ -69,7 +69,7 @@ To run, open gitbash and navigate to the directory. This terminal view is very s
 - `cd <folder_name>` will move you into a folder
 - `cd c:` will move you into the c drive
 - `winpty python importfinances.py <path/to/file>` will run the script once you're in the correct directory (just `python importfinances.py` if on mac)
-    - You'll note that you can provide your file if you do it this way. You're file could be anywhere in your directory, you'll just have to make sure you get the *path correct
+    - You'll note that you can provide your file if you do it this way. Your file could be anywhere in your directory, you'll just have to make sure you get the *path correct
 
 ### *Finding a File or Folders Path
 Find the file in file explorer and then click on the top bar that shows the breadcrumb trail pointing to your current location. That should then highlight the current path which you can copy and paste
